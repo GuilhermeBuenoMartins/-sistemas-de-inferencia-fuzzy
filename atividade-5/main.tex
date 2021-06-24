@@ -132,11 +132,8 @@
     
     \section{Metodologia}
     
-		Separamos a montagem do trabalho em três etapas sendo elas: A Etapa Um consiste em realizar uma pesquisa na literatura para identificar um artigo a qual fosse aderente ao trabalho.
-		Etapa Dois modelagem do código-fonte utilizando linguagem Python e a biblioteca numpy. Ainda nessa etapa, decidimos criar métodos específicos para tratar cada um dos processos SIF:
-		(a) Construção das funções de retas; (b) Fuzzificação; (c) Criação das regras; (d) Inferência; (e) Função de agregação e (f) Cálculo do centroid.
-		Por último a Etapa Três foram realizadas as inferências conforme solicitado no documento de requisitos para elaboração do seminário. Nessa etapa também se elaborou a comparação dos resultados obtidos nas simulações, 
-		e foi utilizado a métrica de avaliação XPTO.
+	    Foi separada a montagem do trabalho em três etapas, sendo elas: (i) realizar uma pesquisa na literatura para identificar um artigo o qual fosse aderente ao trabalho; (ii) modelagem do código-fonte utilizando linguagem Python e a biblioteca numpy bem como a criação de métodos específicos para tratar cada um dos processos SIF; e (iii) realizar as inferências conforme solicitado no documento de requisitos para elaboração do seminário incluindo a comparação dos resultados obtidos nas simulações por meio de métrica de avaliação Erro quadrático. Confere a segunda etapa os seguintes processos: (a) Construção das funções de retas; (b) Fuzzificação; (c) Inferência; (e) Defuzzificação por Primeiro dos Máximos e Último dos Máximos.
+		    
     
      \chapter{Etapa Um}
     
@@ -146,11 +143,11 @@
 		
 		\section{Revisão da Literatura}
 		
-		Para a produção de modelo de sistema de inferência \textit{fuzzy} (SIF) implementado em código, foi realizada uma pesquisa na base de dados da \textit{CAPES} 
-		para identificar um artigo tal qual fosse facilmente reproduzível pelos dados fornecidos. E, como consequência da expressão de busca utilizada \textit{SYSTEM INFERENCE FUZZY} 
-		foi possível encontrar o artigo "\textit{Application of The Fuzzy Inference System Method to Predict The Number of Weaving Fabric Production}.
-		O artigo escolhido possui todas as características necessárias para validar o código construído: Fuzzificação; Inferência; Regras e Defuzzificação.
-		O mesmo também possui os dados de produção de tecidos utilizados no artigo, e são de fácil compreensão os universos de discurso assim como as variáveis linguísticas.
+    		Para a produção de modelo de sistema de inferência \textit{fuzzy} (SIF) implementado em código, foi realizada uma pesquisa na base de dados da \textit{CAPES} 
+    		para identificar um artigo tal qual fosse facilmente reproduzível pelos dados fornecidos. E, como consequência da expressão de busca utilizada \textit{SYSTEM INFERENCE FUZZY} 
+    		foi possível encontrar o artigo "\textit{Application of The Fuzzy Inference System Method to Predict The Number of Weaving Fabric Production}.
+    		O artigo escolhido possui todas as características necessárias para validar o código construído: Fuzzificação; Inferência; Regras e Defuzzificação.
+    		O mesmo também possui os dados de produção de tecidos utilizados no artigo, e são de fácil compreensão os universos de discurso assim como as variáveis linguísticas.
     
 	
 	\chapter{Etapa Dois}
@@ -161,171 +158,123 @@
 		
 		\section{Construção das funções de retas}
 		
-		    %Parágrafo
+		    % Descrição sobre as funções
+		    A função de reta para extração dos coeficientes lineares $\theta_{0}$ e angulares $\theta_{1}$ das funções linguísticas utilizadas por \citeonline{tundo2018application} valeu-se, a princípio:
+		    
+		    \begin{proposicao}
+		    
+		        Dada uma equação de primeiro grau descrita por $y = \theta_{0} + \theta_{1}x$ onde $x$ e $y \in \mathbb{R}$ para os ponto $(x_{0}, y_{0})$ e $(x_{1}, y_{1})$, temos:
+		        
+		        \begin{equation}
+		            \theta_{1} = \frac{y_{1} - y_{0}}{x_{1} - x_{0}}
+		        \end{equation}
+		        
+		        \begin{equation}
+		            \theta_{0} = y_{1} - \theta_{1}x_{1} 
+		        \end{equation}
+		        
+		    \end{proposicao}
 			 
-			  \begin{Cálculo de reta}{Trapezoidal}
-              Para uma amostra $ X=\{x_1,, x_2, \ldots,x_n\} $ de observações, onde $ n $ é o número de observações, se define a média aritmética da seguinte forma:
-              \begin{equation}
-              \mu(X)=\dfrac{1}{n}\sum\limits_{x \in X}x
-              \end{equation}
-              \end{Cálculo de reta}
-              \begin{proposicao}
-              Se $ k $ é uma constante então multiplicar a média de uma amostra $ X $ é o mesmo de multiplicar cada elemento de $ X $ por $ k $, isto é, $ k \times \mu(X) = \dfrac{1}{n} \sum\limits_{x \in X}x\times k $.
-              \end{proposicao}
-              \begin{prova}
-              Desenvolve-se a igualdade:
-              \begin{align*}
-              k \times \mu(X) &= \dfrac{1}{n} \sum\limits_{x \in X}xk \\
-              & \Longleftrightarrow  \dfrac{(x_1k,x_2k, \ldots, x_nk)}{n} \\
-              & \Longleftrightarrow  \dfrac{nk \times (x_1,x_2, \ldots, x_n)}{n} \\
-              & \Longleftrightarrow   k \times \dfrac{(x_1,x_2, \ldots, x_n)}{n} \\
-              & \Longleftrightarrow   k \times \mu(X) \numberequation{1}
-              \end{align*}
-              \end{prova}
-              Assim, concluí-se que $ k \times \mu(X) = \dfrac{1}{n} \sum\limits_{x \in X}x\times k $. $ \square $
-		    %Parágrafo
-			
-		    % controla identação
-             \begin{algorithm}[H]
-             \SetAlgoLined
-             \Entrada{$S,\eta, U$} 
-             \Saida{Número esperado de nós atingidos}
-             \Inicio{
-             	$\sigma(S) = 0$ \\
-             \Para{cada $u \in S$}{
-             	$\sigma(S)\leftarrow \sigma(S)+\textsc{Backtrack}(u,\eta,W,U)$\\
-             }
-             }
-             \Retorna{$\sigma(S)$}
-             \label{alg1}
-             \caption{\textsc{straight_equation}}
-             \end{algorithm}
-			
+			 Tal proposição sendo possível e equação implementável, foi desenvolvido o código da figura {Numero da figura}:
+			 
+			 % Inserir Figura
+			 
 		\section{Fuzzificação}
 		
-		     %Parágrafo
-			 Insira o texto de explicação
+		     % Explicação da função fuzzify
+			 Por meio da mesma equação descrita em \textbf{preposição 3.1} na seção \textbf{Construção das funções de retas}, é possível se chegar a uma lista de valores $y_{i}$, ou seja, uma lista de pertinências $\mu_{i}$ em situações em que dois pontos formam uma reta. Cada elemento $i$ das pertinências $\mu_{i}$, representa um termo linguístico. Assim, o comportamento da função de fuzzificação \textit{fuzzify}, para cada termo linguístico, equipara-se a:
 			 
-		    % controla identação
-             \begin{algorithm}[H]
-             \SetAlgoLined
-             \Entrada{$S,\eta, U$} 
-             \Saida{Número esperado de nós atingidos}
-             \Inicio{
-             	$\sigma(S) = 0$ \\
-             \Para{cada $u \in S$}{
-             	$\sigma(S)\leftarrow \sigma(S)+\textsc{Backtrack}(u,\eta,W,U)$\\
-             }
-             }
-             \Retorna{$\sigma(S)$}
-             \label{alg1}
-             \caption{\textsc{fuzzify}}
-             \end{algorithm}
-			
-		\section{Criação das regras}
-		
-		     %Parágrafo
-			 Insira o texto de explicação
+			 \begin{equation}
+			     \mu_{i} = \begin{cases}
+			        y_{0} \text{, se } x \leq x_{0} \\
+			        \theta_{0} + \theta_1 \text{, se } x_{0} < x \leq x_{i} \\
+			        y_{1} \text{, se } x > x_{1} \\
+		        \end{cases}
+			 \end{equation}
 			 
-		     % controla identação
-             \begin{algorithm}[H]
-             \SetAlgoLined
-             \Entrada{$S,\eta, U$} 
-             \Saida{Número esperado de nós atingidos}
-             \Inicio{
-             	$\sigma(S) = 0$ \\
-             \Para{cada $u \in S$}{
-             	$\sigma(S)\leftarrow \sigma(S)+\textsc{Backtrack}(u,\eta,W,U)$\\
-             }
-             }
-             \Retorna{$\sigma(S)$}
-             \label{alg1}
-             \caption{\textsc{rules_}}
-             \end{algorithm}
-			
+			 % Explicação do código
+			 O processo de fuzzificação constituirá, portanto, um processo que é definido em código conforme \textbf{figura \{Número da figura\}}. 
+			 
+			 
+		     \begin{figure}[ht!]
+    
+        	    \begin{center}
+        	
+        		    \includegraphics[scale=1]{straight equation}
+        	
+        	    \end{center}
+        	
+        	    \caption{Foto da função straight\_equation para extração dos coeficientes linares e angulares}
+        	
+        	\fonte{Elaborada pelo autor)}
+        	
+            \end{figure}
+
 		\section{Inferência}
 		
-			 %Parágrafo
-			 Insira o texto de explicação
-			 
-		     % controla identação
-             \begin{algorithm}[H]
-             \SetAlgoLined
-             \Entrada{$S,\eta, U$} 
-             \Saida{Número esperado de nós atingidos}
-             \Inicio{
-             	$\sigma(S) = 0$ \\
-             \Para{cada $u \in S$}{
-             	$\sigma(S)\leftarrow \sigma(S)+\textsc{Backtrack}(u,\eta,W,U)$\\
-             }
-             }
-             \Retorna{$\sigma(S)$}
-             \label{alg1}
-             \caption{\textsc{infer}}
-             \end{algorithm}
+		     % Criação das regras
+		     A criação das regras é efetuada pela função de inferência \textit{infer} que utiliza de recursividade para executar, em combinação de variáveis, sucessivas operações de minimização. Desta forma, em questão de combinação, opera-se em:
+		     
+		     \begin{equation}
+                \begin{matrix}
+                  \mu_{1,1} & \mu_{1,j} &  \mu_{1,m} \\
+                  \vdots & \vdots &  \vdots \\
+                  \mu_{i,1} & \mu_{i,j} & \mu_{i,m} \\
+                  \vdots &  \vdots & \vdots \\
+                  \mu_{n,1} & \mu_{n,j} & \mu_{n,m}
+                \end{matrix}
+		     \end{equation}
+		     
+		     Cada linha $i$ representada é uma variável linguística e $j$, representa cada termo linguístico correspondente a sua variável linguística. Deste modo, foi transcrita de acordo com a \textbf{figura \{numero da figura\}}.
+		     
+		     \begin{figure}[ht!]
+    
+        	    \begin{center}
+        	
+        		    \includegraphics[scale=1]{infer}
+        	
+        	    \end{center}
+        	
+        	    \caption{Foto da função infer usada para inferir os graus de pertinência}
+        	
+        	\fonte{Elaborada pelo autor)}
+        	
+            \end{figure}
 			
 		\section{Defuzzificação}
 		
-			 %Parágrafo
-			 Insira o texto de explicação
+			 % Explicação sobre a Defuzzificação pelo Primeiro dos Máximos
+			 Dentre os métodos existentes de defuzzificação, foram se utilizados dois métodos conhecidos como o Primeiro dos Máximo, e o outro, Último dos máximo. O Primeiro dos Máximos, que tem, por conseguinte, o comportamento de retorna o menor valor da variável Crisp, ou da abcissa x,  segundo um valor de $\mu$. Não muito obstante desse entendimento, o método de defuzzificação por meio do Último dos Máximo utiliza abordagem inversa, tornando valore maiores de $x$ em relação a $\mu$.
 			 
-		     % controla identação
-             \begin{algorithm}[H]
-             \SetAlgoLined
-             \Entrada{$S,\eta, U$} 
-             \Saida{Número esperado de nós atingidos}
-             \Inicio{
-             	$\sigma(S) = 0$ \\
-             \Para{cada $u \in S$}{
-             	$\sigma(S)\leftarrow \sigma(S)+\textsc{Backtrack}(u,\eta,W,U)$\\
-             }
-             }
-             \Retorna{$\sigma(S)$}
-             \label{alg1}
-             \caption{\textsc{defuzzificacao}}
-             \end{algorithm}
+		     \begin{figure}[ht!]
+    
+        	    \begin{center}
+        	
+        		    \includegraphics[scale=1.1]{f_o_m}
+        	
+        	    \end{center}
+        	
+        	    \caption{Foto da função f_o_m para extrair os valores dos Primeiros dos Máximos}
+        	
+        	\fonte{Elaborada pelo autor)}
+        	
+            \end{figure}
+			 
+			 
+		     \begin{figure}[ht!]
+    
+        	    \begin{center}
+        	
+        		    \includegraphics[scale=1.1]{l_o_m}
+        	
+        	    \end{center}
+        	
+        	    \caption{Foto da função l_o_m para extrair os valores dos Último dos Máximos}
+        	
+        	\fonte{Elaborada pelo autor)}
+        	
+            \end{figure}
 			
-		\section{Função de agregação}
-		
-		     %Parágrafo
-			 Insira o texto de explicação
-			 
-		     % controla identação
-             \begin{algorithm}[H]
-             \SetAlgoLined
-             \Entrada{$S,\eta, U$} 
-             \Saida{Número esperado de nós atingidos}
-             \Inicio{
-             	$\sigma(S) = 0$ \\
-             \Para{cada $u \in S$}{
-             	$\sigma(S)\leftarrow \sigma(S)+\textsc{Backtrack}(u,\eta,W,U)$\\
-             }
-             }
-             \Retorna{$\sigma(S)$}
-             \label{alg1}
-             \caption{\textsc{aggregation}}
-             \end{algorithm}
-			
-		\section{Cálculo do centroid}
-		
-		     %Parágrafo
-			 Insira o texto de explicação
-			 
-		     % controla identação
-            \begin{algorithm}[H]
-             \SetAlgoLined
-             \Entrada{$S,\eta, U$} 
-             \Saida{Número esperado de nós atingidos}
-             \Inicio{
-             	$\sigma(S) = 0$ \\
-             \Para{cada $u \in S$}{
-             	$\sigma(S)\leftarrow \sigma(S)+\textsc{Backtrack}(u,\eta,W,U)$\\
-             }
-             }
-             \Retorna{$\sigma(S)$}
-             \label{alg1}
-             \caption{\textsc{centroid}}
-             \end{algorithm}
 			 
 	\chapter{Etapa Três}
     
@@ -335,11 +284,32 @@
 		
 		\section{Inferências}
 		 
-		 Descrição das inferências....
+		Infelizmente, não foi possível efetuar uma reprodução completa e fidedigna do artigo, pois este faz uso de duas abordagens: Tsukamoto e Takage-Sugeno. Porém o motivo do insucesso em uma completa reprodução do artigo ocorreu pelo fato de que quando utilizado o método de inferência de Takage-Sugeno, havia a falta de algumas variáveis nas regras. Porém, tentou-se utilizar de valores que poderiam se aproximar dos resultados demonstrados no artigo. Com isso, há a proposta de da utilização de outros valores conforme tabela.
 		
-		\section{Analise comparativa dos métodos}
-		
-		 Descrição das análises comparativas....
+		\begin{table}[ht!]
+		    \centering
+		    \begin{tabular}{|c||c|c|c||c|c|c|} \hline
+	            % Cabeçalho 1
+		        \textbf{Tipo} &  \multicolumn{3}{c||}{\textbf{Entradas}} & \multicolumn{3}{c|}{\textbf{Saída}} \\
+		        \hline \hline
+		        % Cabeçalho 2
+		        \textbf{Variáveis} & \textbf{Stoke} & \textbf{Demand} & \textbf{Cost} & \textbf{Takage} & \textbf{P-d-M} & \textbf{U-d-M} \\ \hline
+		        % Linha 1
+		        1 & 60 & 320 & 6000000 & 266.768 & 146.427 & 403.333 \\ \hline
+		        % Linha 2
+		        2 & 70 & 320 & 6000000 & 264.248 & 142.270 & 401.061 \\ \hline
+		        % Linha 3
+		        3 & 120 & 320 & 6000000 & 262.915 & 121.461 & 399.859 \\ \hline
+		        % Linha 4
+		        4 & 60 & 400 & 6000000 & 285.426 & 188.907 & 444.044 \\ \hline
+		        % Linha 5
+		        5 & 60 & 400 & 2450000 & 298.597 & 231.458 & 459.760 \\ \hline
+		        % Linha 6
+		        6 & 60 & 320 & 2450000 & 278.285 & 165.425 & 413.715 \\ \hline
+		    \end{tabular}
+		    \caption{Comparativa dos métodos de saída de Takage-Sugeno (Takage), Primeiro dos Máximos de Mamdani (P-d-M) e Último dos Máximos de Mamdani (U-d-M).}
+		    \label{tab:my_label}
+		\end{table}
 		
 	\chapter{Conclusões}
     
@@ -350,6 +320,20 @@
 		\section{Conclusões}
 		
 		 Descrição da conclusão....
+		 
+	     \begin{figure}[ht!]
+    
+    	    \begin{center}
+    	
+    		    \includegraphics[scale=0.4]{WhatsApp Image 2021-06-24 at 05.51.07}
+    	
+    	    \end{center}
+    	
+    	    \caption{Análises comparativos feitas no Excel.}
+    	
+    	\fonte{Elaborada pelo autor)}
+    	
+    \end{figure}
      
     \subsubsection{Exemplo de subsubseção}
     
@@ -379,16 +363,3 @@
     \bibliography{refs}
     		   
     \end{document}
-© 2021 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
-Loading complete
